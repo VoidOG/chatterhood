@@ -13,7 +13,7 @@ invite_link = "https://t.me/+ctEPhH39dL4yYzJl"  # Permanent Private Link
 channel_username = "thechatterhood"  # Channel username (without @)
 log_channel_id = -1002361577280  # Log Channel ID (Yahan history jayegi)
 message_id = 3  # Channel pe jo existing message hai uska ID
-default_interval = 1800  # Default Interval (30 min)
+default_interval = 900  # Default Interval (30 min)
 intervals_dict = {}  # Har group ka custom interval store karega
 
 # ❌ Only These Admins Can Use Commands
@@ -27,56 +27,55 @@ def generate_username():
 
 async def change_username(chat_id=None, force=False):
     """🔥 Group ka username change karega (Force ya Scheduled)"""
-    async with app:
-        while True:
-            if not force:  # Agar forcechange nahi hai toh interval ka wait karega
-                interval = intervals_dict.get(chat_id, default_interval)
-                await asyncio.sleep(interval)
+    while True:
+        if not force:  # Agar forcechange nahi hai toh interval ka wait karega
+            interval = intervals_dict.get(chat_id, default_interval)
+            await asyncio.sleep(interval)
+
+        try:
+            # ✅ Group ID dynamically fetch karo
+            chat = await app.get_chat(invite_link)
+            group_id = chat.id  
+            print(f"✅ Group found: {chat.title} ({group_id})")
+
+            while True:
+                new_username = generate_username()
+                try:
+                    await app.set_chat_username(group_id, new_username)
+                    print(f"✅ Username changed to @{new_username}")
+                    break
+                except UsernameOccupied:
+                    print(f"❌ Username @{new_username} already taken, trying again...")
+                    await asyncio.sleep(2)
+                except FloodWait as e:
+                    print(f"⏳ Rate limit! Waiting {e.value} seconds...")
+                    await asyncio.sleep(e.value)
+                except Exception as e:
+                    print(f"🚨 Error while changing username: {e}")
+                    return
 
             try:
-                # ✅ Group ID dynamically fetch karo
-                chat = await app.get_chat(invite_link)
-                group_id = chat.id  
-                print(f"✅ Group found: {chat.title} ({group_id})")
+                # ✅ Channel ID dynamically fetch karo
+                channel = await app.get_chat(channel_username)
+                channel_id = channel.id  
+                print(f"✅ Channel found: {channel.title} ({channel_id})")
 
-                while True:
-                    new_username = generate_username()
-                    try:
-                        await app.set_chat_username(group_id, new_username)
-                        print(f"✅ Username changed to @{new_username}")
-                        break
-                    except UsernameOccupied:
-                        print(f"❌ Username @{new_username} already taken, trying again...")
-                        await asyncio.sleep(2)
-                    except FloodWait as e:
-                        print(f"⏳ Rate limit! Waiting {e.value} seconds...")
-                        await asyncio.sleep(e.value)
-                    except Exception as e:
-                        print(f"🚨 Error while changing username: {e}")
-                        return
+                # ✅ Message edit karo
+                await app.edit_message_text(channel_id, message_id, f"@{new_username}")
+                print("✅ Channel message updated.")
 
-                try:
-                    # ✅ Channel ID dynamically fetch karo
-                    channel = await app.get_chat(channel_username)
-                    channel_id = channel.id  
-                    print(f"✅ Channel found: {channel.title} ({channel_id})")
-
-                    # ✅ Message edit karo
-                    await app.edit_message_text(channel_id, message_id, f"@{new_username}")
-                    print("✅ Channel message updated.")
-
-                    # ✅ Log Channel me username history bhejo
-                    await app.send_message(log_channel_id, f"🔹 **New Username Set:** @{new_username}")
-
-                except Exception as e:
-                    print(f"🚨 Message edit error: {e}")
-
-                if force:  # Agar forcechange hai toh loop break kar do
-                    break
+                # ✅ Log Channel me username history bhejo
+                await app.send_message(log_channel_id, f"🔹 **New Username Set:** @{new_username}")
 
             except Exception as e:
-                print(f"🚨 Could not fetch group via invite link: {e}")
-                await asyncio.sleep(30)
+                print(f"🚨 Message edit error: {e}")
+
+            if force:  # Agar forcechange hai toh loop break kar do
+                break
+
+        except Exception as e:
+            print(f"🚨 Could not fetch group via invite link: {e}")
+            await asyncio.sleep(30)
 
 # 🛑 **Unauthorized Users Ko Ignore Karne Wala Decorator**
 def admin_only(func):
@@ -107,8 +106,9 @@ async def set_interval(client, message):
 @admin_only
 async def force_change(client, message):
     chat_id = message.chat.id
-    await change_username(chat_id, force=True)  # Instant change call
+    asyncio.create_task(change_username(chat_id, force=True))  # ✅ New Task Create Karo (No Reconnect)
 
 # 🚀 Run Bot
 print("✅ Bot is running...")
-app.run(change_username())
+app.start()
+asyncio.run(change_username())  # ✅ Direct Function Call (No Double Connection)
