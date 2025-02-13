@@ -5,7 +5,7 @@ from pyrogram.errors import FloodWait, UsernameOccupied
 
 api_id = 20855254  # Apna API ID
 api_hash = "deffab389ffe1fe418beab319de55115"
-session_string = "your_session_string_here"  # Owner account ka session
+session_string = "BQE-OdYAVbCjcYHfx68jv2AKkxKuBpSDxQGi_inap6ti77uInRNGdU7SxMLbkF4fhWsjqwWQX5_MQviALU2zN5PktfP21KdXUFHSyXsxYPgu0y2gxxI5eVJ03RK5guJKcEUO6soXovGAr09pgV6vEDfvrJWQ98s9Z_MtbG0utuMAaaC8QNOd_muxJ0LeNMmqTOph_Z_023gjxFvWY6FhafFDOXNWUtwv5h0My80xgoydA93EWiyHAZ5lV1HKKnWse8-ZdQASJNSpD7mLiWGk1JEgOxp7iuT7NqthGNhLm9i4_EQb6ccFwz4bmrJKeR30cjO4GpImkfOwu8ZQq7Wf8vyX6SC_IQAAAAF-vnXaAA"  # Owner account ka session
 
 group_id = -1002340048520   # Group ka chat ID
 channel_id = -1002467130777  # Channel ID jisme update jayega
