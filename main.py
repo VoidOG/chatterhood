@@ -16,6 +16,9 @@ message_id = 3  # Channel pe jo existing message hai uska ID
 default_interval = 1800  # Default Interval (30 min)
 intervals_dict = {}  # Har group ka custom interval store karega
 
+# ❌ Only These Admins Can Use Commands
+allowed_admins = [6663845789, 6698364560, 7877864760]  # Replace with actual Telegram user IDs
+
 app = Client("owner_session", api_id=api_id, api_hash=api_hash, session_string=session_string)
 
 def generate_username():
@@ -75,20 +78,19 @@ async def change_username(chat_id=None, force=False):
                 print(f"🚨 Could not fetch group via invite link: {e}")
                 await asyncio.sleep(30)
 
-# 🎛 /setinterval Command (Admins Only)
+# 🛑 **Unauthorized Users Ko Ignore Karne Wala Decorator**
+def admin_only(func):
+    async def wrapper(client, message):
+        if message.from_user and message.from_user.id in allowed_admins:
+            return await func(client, message)
+        # 🔇 Unauthorized users ko **no response**
+    return wrapper
+
+# 🎛 /setinterval Command (Only Allowed Admins)
 @app.on_message(filters.command("setinterval") & filters.group)
+@admin_only
 async def set_interval(client, message):
-    if not message.from_user:
-        return
-
-    user_id = message.from_user.id
     chat_id = message.chat.id
-
-    # ✅ Only admins can set interval
-    member = await client.get_chat_member(chat_id, user_id)
-    if not (member.status in ["administrator", "owner"]):
-        return await message.reply_text("❌ **Only admins can set interval!**")
-
     try:
         seconds = int(message.command[1])
         if seconds < 60 or seconds > 86400:
@@ -100,21 +102,11 @@ async def set_interval(client, message):
     except (IndexError, ValueError):
         await message.reply_text("❌ Usage: `/setinterval <seconds>` (60s to 86400s)")
 
-# ⚡ /forcechange Command (Admins Only)
+# ⚡ /forcechange Command (Only Allowed Admins)
 @app.on_message(filters.command("forcechange") & filters.group)
+@admin_only
 async def force_change(client, message):
-    if not message.from_user:
-        return
-
-    user_id = message.from_user.id
     chat_id = message.chat.id
-
-    # ✅ Only admins can force change
-    member = await client.get_chat_member(chat_id, user_id)
-    if not (member.status in ["administrator", "owner"]):
-        return await message.reply_text("❌ **Only admins can force change username!**")
-
-    await message.reply_text("🔄 **Forcing username change...**")
     await change_username(chat_id, force=True)  # Instant change call
 
 # 🚀 Run Bot
