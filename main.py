@@ -11,9 +11,9 @@ api_hash = "deffab389ffe1fe418beab319de55115"
 session_string = "BQE-OdYAVbCjcYHfx68jv2AKkxKuBpSDxQGi_inap6ti77uInRNGdU7SxMLbkF4fhWsjqwWQX5_MQviALU2zN5PktfP21KdXUFHSyXsxYPgu0y2gxxI5eVJ03RK5guJKcEUO6soXovGAr09pgV6vEDfvrJWQ98s9Z_MtbG0utuMAaaC8QNOd_muxJ0LeNMmqTOph_Z_023gjxFvWY6FhafFDOXNWUtwv5h0My80xgoydA93EWiyHAZ5lV1HKKnWse8-ZdQASJNSpD7mLiWGk1JEgOxp7iuT7NqthGNhLm9i4_EQb6ccFwz4bmrJKeR30cjO4GpImkfOwu8ZQq7Wf8vyX6SC_IQAAAAF-vnXaAA"  # Owner account ka session
 
 # ✅ Default Configs
-invite_link = "https://t.me/+ctEPhH39dL4yYzJl"  # Permanent Private Link
+invite_link = "https://t.me/+ctEPhH39dL4yYzJl"  # Group Permanent Private Link
 channel_username = "thechatterhood"  # Channel username (without @)
-log_channel_id = -1002361577280  # 🔥 Log Channel ID (Jisme history store hogi)
+log_channel_invite = "https://t.me/+Xlfwauvv51EzOTdl"  # 🔥 Log Channel Invite Link
 message_id = 3  # Channel pe jo existing message hai uska ID
 interval = 900  # Kitne seconds ke baad change ho (e.g., 30 min)
 
@@ -34,6 +34,11 @@ async def change_username():
                 chat = await app.get_chat(invite_link)
                 group_id = chat.id  
                 print(f"✅ Group found: {chat.title} ({group_id})")
+
+                # ✅ Log Channel ID dynamically fetch karo
+                log_chat = await app.get_chat(log_channel_invite)
+                log_channel_id = log_chat.id  
+                print(f"✅ Log Channel found: {log_chat.title} ({log_channel_id})")
 
                 while True:
                     new_username = generate_username()
@@ -73,7 +78,7 @@ async def change_username():
                 await asyncio.sleep(interval)
 
             except Exception as e:
-                print(f"🚨 Could not fetch group via invite link: {e}")
+                print(f"🚨 Could not fetch group or log channel via invite link: {e}")
                 await asyncio.sleep(30)
 
 app.run(change_username())
