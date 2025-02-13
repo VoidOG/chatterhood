@@ -10,21 +10,21 @@ session_string = "BQE-OdYAVbCjcYHfx68jv2AKkxKuBpSDxQGi_inap6ti77uInRNGdU7SxMLbkF
 invite_link = "https://t.me/+ctEPhH39dL4yYzJl"  # Permanent Private Link
 channel_username = "thechatterhood"  # Channel ka username (without @)
 message_id = 3  # Channel pe jo existing message hai uska ID
-interval = 1800  # Kitne seconds ke baad change ho (e.g., 1800 = 30 min)
+interval = 1800  # Kitne seconds ke baad change ho (e.g., 30 min)
 
 app = Client("owner_session", api_id=api_id, api_hash=api_hash, session_string=session_string)
 
 def generate_username():
-    words = ["alpha", "beta", "gamma", "delta", "sigma", "omega"]
-    return f"{random.choice(words)}_{random.randint(1000, 9999)}"
+    """🔥 Random username generate karega with 'chatterhood'"""
+    return f"chatterhood_{random.randint(1000, 9999)}"
 
 async def change_username():
     async with app:
         while True:
             try:
-                # 🔥 Invite link se group info lena
+                # ✅ Group ID dynamically fetch karo
                 chat = await app.get_chat(invite_link)
-                group_id = chat.id  # ✅ Group ID dynamically le raha hai
+                group_id = chat.id  
                 print(f"✅ Group found: {chat.title} ({group_id})")
 
                 while True:
@@ -40,16 +40,16 @@ async def change_username():
                         print(f"⏳ Rate limit! Waiting {e.value} seconds...")
                         await asyncio.sleep(e.value)
                     except Exception as e:
-                        print(f"🚨 Error: {e}")
+                        print(f"🚨 Error while changing username: {e}")
                         return
 
                 try:
-                    # 🔥 Channel username se ID fetch karna
+                    # ✅ Channel ID dynamically fetch karo
                     channel = await app.get_chat(channel_username)
-                    channel_id = channel.id  # ✅ Channel ID dynamically le raha hai
+                    channel_id = channel.id  
                     print(f"✅ Channel found: {channel.title} ({channel_id})")
 
-                    # 🔥 Message edit karna
+                    # ✅ Message edit karo
                     await app.edit_message_text(channel_id, message_id, f"@{new_username}")
                     print("✅ Channel message updated.")
                 except Exception as e:
@@ -59,6 +59,6 @@ async def change_username():
 
             except Exception as e:
                 print(f"🚨 Could not fetch group via invite link: {e}")
-                await asyncio.sleep(30)  # Agar fail ho toh retry kare
+                await asyncio.sleep(30)
 
 app.run(change_username())
