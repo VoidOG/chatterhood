@@ -10,7 +10,7 @@ session_string = "BQE-OdYAVbCjcYHfx68jv2AKkxKuBpSDxQGi_inap6ti77uInRNGdU7SxMLbkF
 invite_link = "https://t.me/+ctEPhH39dL4yYzJl"  # Permanent Private Link
 channel_id = -1002467130777  # Channel ID jisme update jayega
 message_id = 3  # Channel pe jo existing message hai uska ID
-interval = 1800  # Kitne seconds ke baad change ho (e.g., 1800 = 30 min)
+interval = 900  # Kitne seconds ke baad change ho (e.g., 1800 = 30 min)
 
 app = Client("owner_session", api_id=api_id, api_hash=api_hash, session_string=session_string)
 
